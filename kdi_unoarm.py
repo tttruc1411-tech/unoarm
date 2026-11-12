@@ -50,10 +50,10 @@ try:
 except ImportError:
     CO_PHAN_CUNG = False                # may tinh, hoac board thieu thu vien nen (xem _dam_bao_khoi_tao)
 try:
-    from constants import S1 as PORT_S1, S2 as PORT_S2, S3 as PORT_S3, M1 as PORT_M1
+    from constants import S1 as PORT_S1, S2 as PORT_S2, S3 as PORT_S3
 except ImportError:
     PORT_S1, PORT_S2, PORT_S3 = 0, 1, 2
-    PORT_M1 = 1
+PORT_M1 = 1     # bitmask cong dong co M1 cua Motor Driver V2 (co dinh, khong phu thuoc constants.py)
 
 # ---------------------------------------------------------------------------------------------
 # KICH THUOC (cm)
@@ -598,12 +598,15 @@ def khoi_tao(dry_run=True, S2_ban_dau=S2_BAT_DAU, S3_ban_dau=S3_BAT_DAU):
     servo1 = Servo(_md, PORT_S1, 180)
     servo2 = Servo(_md, PORT_S2, 180)
     servo3 = Servo(_md, PORT_S3, 180)
-    servo1.limit(S1_MIN, S1_MAX)
     servo2.limit(S2_MIN, S2_MAX)        # lop chan thu hai, ngoai hinh thang
     servo3.limit(S3_MIN, S3_MAX)
-    servo1.angle(S1_now)
     servo2.angle(S2_now)                # giu servo o tu the bat dau (robot da duoc dat tay o day)
     servo3.angle(S3_now)
+    try:                                # S1 la phan them: loi o day khong duoc lam hong S2/S3
+        servo1.limit(S1_MIN, S1_MAX)
+        servo1.angle(S1_now)
+    except Exception as e:
+        print('Canh bao: khong khoi tao duoc S1:', e)
     print('da noi phan cung. Gui tu the bat dau S1 = %s, S2 = %s, S3 = %s' % (S1_now, S2_now, S3_now))
     _da_khoi_tao = True
     return True
