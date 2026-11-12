@@ -54,6 +54,7 @@ try:
 except ImportError:
     PORT_S1, PORT_S2, PORT_S3 = 0, 1, 2
 PORT_M1 = 1     # bitmask cong dong co M1 cua Motor Driver V2 (co dinh, khong phu thuoc constants.py)
+DAU_HUT_DAO_CHIEU = True    # dong co hut cam o M1 chay dung chieu khi dao chieu (giong khoi OhStem tick "dao chieu quay")
 
 # ---------------------------------------------------------------------------------------------
 # KICH THUOC (cm)
@@ -504,7 +505,7 @@ def _dieu_khien_dau_hut_core(bat, toc_do=100):
     if _md is not None:
         try:
             if bat:
-                _md.set_motors(PORT_M1, int(toc_do))
+                _md.set_motors(PORT_M1, -int(toc_do) if DAU_HUT_DAO_CHIEU else int(toc_do))
             else:
                 _md.stop(PORT_M1)
         except Exception as e:
