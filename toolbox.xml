@@ -52,6 +52,11 @@
       </value>
     </block>
 
+    <!-- Điều khiển đầu hút (M1) -->
+    <block type="unoarm_control_sucker">
+      <field name="ACTION">1</field>
+    </block>
+
     <!-- Lấy toạ độ hiện tại r_now -->
     <block type="unoarm_get_r_now"></block>
     <!-- Lấy toạ độ hiện tại h_now -->

@@ -54,6 +54,7 @@ Blockly.Blocks['unoarm_check_valid'] = {
         .appendField("S3:");
     this.appendValueInput("S3")
         .setCheck("Number");
+    this.setInputsInline(true);
     // Quan trọng: khai báo là output block và kiểu Boolean
     this.setOutput(true, "Boolean");
     this.setColour(ARM_COLOR);
@@ -93,6 +94,7 @@ Blockly.Blocks['unoarm_go_to_s2_s3'] = {
         .appendField("S3:");
     this.appendValueInput("TO_S3")
         .setCheck("Number");
+    this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(ARM_COLOR);
@@ -121,6 +123,7 @@ Blockly.Blocks['unoarm_go_to_r_h'] = {
         .appendField("h:");
     this.appendValueInput("H")
         .setCheck("Number");
+    this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(ARM_COLOR);
@@ -206,12 +209,14 @@ Blockly.Python['unoarm_get_S3'] = function(block) {
 // --- Block: Xoay đế S1 ---
 Blockly.Blocks['unoarm_rotate_s1'] = {
   init: function() {
-    this.appendDummyInput().appendField("Xoay đế S1 đến góc:");
-    this.appendValueInput("ANGLE").setCheck("Number");
+    this.appendValueInput("ANGLE")
+        .setCheck("Number")
+        .appendField("Xoay đế S1 đến góc:");
+    this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(ARM_COLOR);
-    this.setTooltip("Xoay đế S1 (10-170, 90 là chính giữa)");
+    this.setTooltip("Xoay đế S1 từ 10 đến 170 độ (90 là chính giữa)");
     this.setHelpUrl("");
   }
 };
@@ -221,11 +226,36 @@ Blockly.Python['unoarm_rotate_s1'] = function(block) {
   return 'await kdi_unoarm.quay_ve_goc(' + a + ')\n';
 };
 
+// --- Block: Điều khiển đầu hút (M1) ---
+Blockly.Blocks['unoarm_control_sucker'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Đầu hút (M1):")
+        .appendField(new Blockly.FieldDropdown([
+          ["bật (hút)", "1"],
+          ["tắt (thả)", "0"]
+        ]), "ACTION");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(ARM_COLOR);
+    this.setTooltip("Bật hoặc tắt đầu hút chân không cắm tại cổng động cơ M1");
+    this.setHelpUrl("");
+  }
+};
+Blockly.Python['unoarm_control_sucker'] = function(block) {
+  unoarmUse();
+  var act = block.getFieldValue('ACTION');
+  return 'await kdi_unoarm.dieu_khien_dau_hut(' + (act === '1' ? 'True' : 'False') + ')\n';
+};
+
 // --- Block: Đặt tốc độ (%) ---
 Blockly.Blocks['unoarm_set_speed'] = {
   init: function() {
-    this.appendDummyInput().appendField("Đặt tốc độ cánh tay (%)");
-    this.appendValueInput("SPEED").setCheck("Number");
+    this.appendValueInput("SPEED")
+        .setCheck("Number")
+        .appendField("Đặt tốc độ cánh tay (%)");
+    this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(ARM_COLOR);
@@ -279,6 +309,7 @@ Blockly.Blocks['unoarm_set_limits'] = {
     this.appendValueInput("MAXSTEP").setCheck("Number");
     this.appendDummyInput().appendField("h tối thiểu (cm)");
     this.appendValueInput("HMIN").setCheck("Number");
+    this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(ARM_COLOR);
@@ -300,6 +331,7 @@ Blockly.Blocks['unoarm_can_reach'] = {
     this.appendValueInput("R").setCheck("Number");
     this.appendDummyInput().appendField("h:");
     this.appendValueInput("H").setCheck("Number");
+    this.setInputsInline(true);
     this.setOutput(true, "Boolean");
     this.setColour(ARM_COLOR);
     this.setTooltip("True nếu từ vị trí hiện tại đi thẳng tới được (r, h)");

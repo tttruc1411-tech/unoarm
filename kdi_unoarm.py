@@ -50,9 +50,10 @@ try:
 except ImportError:
     CO_PHAN_CUNG = False                # may tinh, hoac board thieu thu vien nen (xem _dam_bao_khoi_tao)
 try:
-    from constants import S1 as PORT_S1, S2 as PORT_S2, S3 as PORT_S3
+    from constants import S1 as PORT_S1, S2 as PORT_S2, S3 as PORT_S3, M1 as PORT_M1
 except ImportError:
     PORT_S1, PORT_S2, PORT_S3 = 0, 1, 2
+    PORT_M1 = 1
 
 # ---------------------------------------------------------------------------------------------
 # KICH THUOC (cm)
@@ -109,6 +110,7 @@ servo2 = None
 servo3 = None
 _dang_chay = False      # dang di chuyen S2/S3
 _dang_chay_S1 = False   # dang quay S1
+_trang_thai_dau_hut = False # trang thai bat/tat cua dau hut M1
 _yeu_cau_dung = False   # dung_lai() dat True de cac vong di chuyen dang chay thoat ngay
 _da_khoi_tao = False    # khoi_tao() da chay xong (goi tay hoac tu dong o lan di chuyen dau tien)
 
@@ -321,10 +323,16 @@ def kiem_tra_duong_di(to_S2, to_S3):
 def dung_lai():
     """Dung NGAY lenh di chuyen dang chay (servo giu o goc da gui toi buoc cuoi). Khong lam gi neu dang dung yen.
     Dung cho khoi 'dung lai' va cho hook yolo_uno.deinit khi chuong trinh bi dung."""
-    global _yeu_cau_dung
+    global _yeu_cau_dung, _trang_thai_dau_hut
     if _dang_chay or _dang_chay_S1:
         _yeu_cau_dung = True
         print('dung_lai: dung lenh dang chay')
+    if _md is not None and not DRY_RUN:
+        try:
+            _md.stop(PORT_M1)
+        except Exception:
+            pass
+    _trang_thai_dau_hut = False
 
 
 def _het_yeu_cau_dung():
@@ -475,6 +483,62 @@ async def ve_vi_tri_dau():
 
 
 # ---------------------------------------------------------------------------------------------
+# DAU HUT CHAN KHONG (CONG DONG CO M1)
+# ---------------------------------------------------------------------------------------------
+def _dieu_khien_dau_hut_core(bat, toc_do=100):
+    global _trang_thai_dau_hut
+    _trang_thai_dau_hut = bool(bat)
+    if DRY_RUN:
+        print('[DRY-RUN] Dau hut (M1): %s (toc do %d%%)' % ('BAT' if bat else 'TAT', toc_do if bat else 0))
+        return True
+    if _md is not None:
+        try:
+            if bat:
+                _md.set_motors(PORT_M1, int(toc_do))
+            else:
+                _md.stop(PORT_M1)
+        except Exception as e:
+            print('Loi dieu khien dau hut M1:', e)
+            return False
+    _log('Dau hut (M1): %s' % ('BAT' if bat else 'TAT'))
+    return True
+
+
+async def dieu_khien_dau_hut(bat=True, toc_do=100):
+    """Bat hoac tat dau hut chan khong o cong M1.
+    bat=True/1: bat dau hut (toc do 100%)
+    bat=False/0: tat dau hut (dung dong co M1, nha vat)"""
+    if not await _dam_bao_khoi_tao():
+        return False
+    return _dieu_khien_dau_hut_core(bat, toc_do)
+
+
+async def hut(toc_do=100):
+    """Bat dau hut o cong M1."""
+    return await dieu_khien_dau_hut(True, toc_do)
+
+
+async def tha():
+    """Tat dau hut o cong M1."""
+    return await dieu_khien_dau_hut(False, 0)
+
+
+def bat_dau_hut(toc_do=100):
+    """Ham dong bo: bat dau hut ngay neu driver da san sang."""
+    return _dieu_khien_dau_hut_core(True, toc_do)
+
+
+def tat_dau_hut():
+    """Ham dong bo: tat dau hut ngay."""
+    return _dieu_khien_dau_hut_core(False, 0)
+
+
+def trang_thai_dau_hut():
+    """Tra ve True neu dau hut dang bat, False neu dang tat."""
+    return _trang_thai_dau_hut
+
+
+# ---------------------------------------------------------------------------------------------
 # KHOI TAO VA THONG TIN
 # ---------------------------------------------------------------------------------------------
 def _tim_driver():
@@ -594,6 +658,7 @@ def thong_tin():
     print('che do: %s' % ('DRY-RUN (khong gui lenh)' if DRY_RUN else 'THAT (gui lenh servo)'))
     print('S1 = %d, S2 = %d, S3 = %d' % (S1_now, S2_now, S3_now))
     print('phi1 = %.2f, phi2 = %.2f, r = %.2f, h = %.2f' % (phi1, phi2, r_now, h_now))
+    print('dau hut M1: %s' % ('BAT' if _trang_thai_dau_hut else 'TAT'))
     print('gioi han moi lan = %s do, H_TOI_THIEU = %s cm, delay = %d ms/buoc' % (TOI_DA_MOI_LAN, H_TOI_THIEU, DELAY_MS))
 
 
