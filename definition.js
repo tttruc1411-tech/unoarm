@@ -216,7 +216,7 @@ Blockly.Blocks['unoarm_rotate_s1'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setColour(ARM_COLOR);
-    this.setTooltip("Xoay đế S1 từ 10 đến 170 độ (90 là chính giữa)");
+    this.setTooltip("Xoay đế S1 từ 0 đến 180 độ (90 là chính giữa)");
     this.setHelpUrl("");
   }
 };

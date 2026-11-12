@@ -67,8 +67,8 @@ _d5 = 5       # DE: doan dung toi dau hut
 # ---------------------------------------------------------------------------------------------
 # VUNG HOP LE (hinh thang)
 # ---------------------------------------------------------------------------------------------
-S1_MIN = 10
-S1_MAX = 170
+S1_MIN = 0
+S1_MAX = 180
 S2_MIN = 10
 S3_MIN = 10
 S3_MAX = 100
@@ -436,7 +436,7 @@ async def go_to_r_h(r, h, delay_ms=None):
 
 
 async def quay_ve_goc(goc_S1, delay_ms=None):
-    """Quay de S1 (90 = chinh giua). Nho S1_now: phai dat tay de o 90 truoc khi cap nguon."""
+    """Quay de S1 (90 = chinh giua). Gioi han [0, 180]. Neu vuot nguong se tu dong ve bien va dung yen."""
     global S1_now, _dang_chay_S1
     if delay_ms is None:
         delay_ms = DELAY_MS
@@ -447,10 +447,20 @@ async def quay_ve_goc(goc_S1, delay_ms=None):
     if _dang_chay_S1:
         print('S1 dang quay, bo qua lenh moi')
         return False
-    g = int(round(goc_S1))
-    if g < S1_MIN or g > S1_MAX:
-        print('khong hop le: S1 = %d nam ngoai pham vi cho phep [%d, %d]' % (g, S1_MIN, S1_MAX))
+    try:
+        g = int(round(goc_S1))
+    except (TypeError, ValueError):
+        print('khong hop le: goc S1 khong phai so:', goc_S1)
         return False
+    if g < S1_MIN:
+        _log('S1 = %d nho hon %d, gioi han ve %d' % (g, S1_MIN, S1_MIN))
+        g = S1_MIN
+    elif g > S1_MAX:
+        _log('S1 = %d lon hon %d, gioi han ve %d' % (g, S1_MAX, S1_MAX))
+        g = S1_MAX
+    if S1_now == g:
+        _log('S1 da o goc %d' % g)
+        return True
     n = abs(g - S1_now)
     if TOI_DA_MOI_LAN is not None and n > TOI_DA_MOI_LAN:
         print('khong hop le: buoc quay S1 %d do vuot gioi han moi lan %s do' % (n, TOI_DA_MOI_LAN))
