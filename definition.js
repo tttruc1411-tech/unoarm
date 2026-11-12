@@ -206,7 +206,7 @@ Blockly.Python['unoarm_get_S3'] = function(block) {
 // --- Block: Xoay đế S1 ---
 Blockly.Blocks['unoarm_rotate_s1'] = {
   init: function() {
-    this.appendDummyInput().appendField("Xoay đế S1 đến góc");
+    this.appendDummyInput().appendField("Xoay đế S1 đến góc:");
     this.appendValueInput("ANGLE").setCheck("Number");
     this.setPreviousStatement(true);
     this.setNextStatement(true);

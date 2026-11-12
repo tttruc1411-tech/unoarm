@@ -66,6 +66,8 @@ _d5 = 5       # DE: doan dung toi dau hut
 # ---------------------------------------------------------------------------------------------
 # VUNG HOP LE (hinh thang)
 # ---------------------------------------------------------------------------------------------
+S1_MIN = 10
+S1_MAX = 170
 S2_MIN = 10
 S3_MIN = 10
 S3_MAX = 100
@@ -438,10 +440,9 @@ async def quay_ve_goc(goc_S1, delay_ms=None):
         print('S1 dang quay, bo qua lenh moi')
         return False
     g = int(round(goc_S1))
-    if g < 0:
-        g = 0
-    if g > 180:
-        g = 180
+    if g < S1_MIN or g > S1_MAX:
+        print('khong hop le: S1 = %d nam ngoai pham vi cho phep [%d, %d]' % (g, S1_MIN, S1_MAX))
+        return False
     n = abs(g - S1_now)
     if TOI_DA_MOI_LAN is not None and n > TOI_DA_MOI_LAN:
         print('khong hop le: buoc quay S1 %d do vuot gioi han moi lan %s do' % (n, TOI_DA_MOI_LAN))
@@ -523,11 +524,13 @@ def khoi_tao(dry_run=True, S2_ban_dau=S2_BAT_DAU, S3_ban_dau=S3_BAT_DAU):
     servo1 = Servo(_md, PORT_S1, 180)
     servo2 = Servo(_md, PORT_S2, 180)
     servo3 = Servo(_md, PORT_S3, 180)
+    servo1.limit(S1_MIN, S1_MAX)
     servo2.limit(S2_MIN, S2_MAX)        # lop chan thu hai, ngoai hinh thang
     servo3.limit(S3_MIN, S3_MAX)
+    servo1.angle(S1_now)
     servo2.angle(S2_now)                # giu servo o tu the bat dau (robot da duoc dat tay o day)
     servo3.angle(S3_now)
-    print('da noi phan cung. Gui tu the bat dau S2 = %s, S3 = %s' % (S2_now, S3_now))
+    print('da noi phan cung. Gui tu the bat dau S1 = %s, S2 = %s, S3 = %s' % (S1_now, S2_now, S3_now))
     _da_khoi_tao = True
     return True
 
